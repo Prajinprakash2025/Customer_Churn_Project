@@ -1,0 +1,191 @@
+{% extends 'user/base_user.html' %}
+
+{% block title %}Checkout - ShopHub{% endblock %}
+
+{% block extra_css %}
+<style>
+    .checkout-card {
+        border-radius: 16px;
+        border: 1px solid #f0f0f5;
+        background: white;
+        transition: all 0.2s ease;
+    }
+    .address-card {
+        cursor: pointer;
+        position: relative;
+    }
+    .address-card:hover {
+        border-color: var(--blue-light);
+    }
+    .address-card input[type="radio"] {
+        display: none;
+    }
+    .address-card input[type="radio"]:checked + .card-body {
+        border: 2px solid var(--blue);
+        background: #f0f7ff;
+        border-radius: 16px;
+    }
+    .card-body {
+        border: 2px solid transparent;
+        border-radius: 16px;
+        padding: 20px;
+    }
+    .summary-item {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 12px;
+        font-size: 14px;
+    }
+    .form-floating > .form-control:focus ~ label,
+    .form-floating > .form-control:not(:placeholder-shown) ~ label {
+        color: var(--blue);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row g-4">
+    <!-- Left Column: Shipping & Billing -->
+    <div class="col-lg-8">
+        <div class="d-flex align-items-center mb-4 gap-2">
+            <div style="width: 4px; height: 32px; background: var(--blue); border-radius: 2px;"></div>
+            <h2 class="fw-bold mb-0">Delivery Details</h2>
+        </div>
+
+        <form method="POST" id="checkout-form">
+            {% csrf_token %}
+
+            <div class="mb-5">
+                <h5 class="fw-bold mb-3 text-muted">Select a delivery address</h5>
+                <div class="row g-3">
+                    {% for addr in addresses %}
+                    <div class="col-md-6">
+                        <label class="checkout-card address-card w-100">
+                            <input type="radio" name="address_id" value="{{ addr.id }}" {% if addr.is_default %}checked{% endif %}>
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <h6 class="fw-bold mb-0">{{ addr.full_name }}</h6>
+                                    <i class="fas fa-check-circle text-primary check-icon" style="display: none;"></i>
+                                </div>
+                                <p class="text-muted small mb-1">{{ addr.address_line }}</p>
+                                <p class="text-muted small mb-2">{{ addr.city }}, {{ addr.state }} - {{ addr.pincode }}</p>
+                                <div class="small fw-medium">
+                                    <i class="fas fa-phone-alt me-1 opacity-50"></i> {{ addr.phone }}
+                                </div>
+                            </div>
+                        </label>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="checkout-card p-4">
+                <h5 class="fw-bold mb-4">Or Enter New Address</h5>
+                <div class="row g-3">
+                    <div class="col-12">
+                        <div class="form-floating">
+                            <input type="text" name="full_name" class="form-control" id="id_full_name" placeholder="Full Name">
+                            <label for="id_full_name">Recipient Name</label>
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <div class="form-floating">
+                            <textarea name="address" class="form-control" id="id_address" placeholder="Address" style="height: 100px"></textarea>
+                            <label for="id_address">Complete Address</label>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-floating">
+                            <input type="text" name="phone" class="form-control" id="id_phone" placeholder="Phone">
+                            <label for="id_phone">Phone Number</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mt-4 d-lg-none">
+                <button type="submit" class="btn btn-primary btn-lg w-100 fw-bold py-3 shadow-sm border-0" style="border-radius: 12px;">
+                    Confirm & Place Order
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Right Column: Order Summary -->
+    <div class="col-lg-4">
+        <div class="sticky-top" style="top: 100px;">
+            <div class="checkout-card p-4 shadow-sm mb-4">
+                <h4 class="fw-bold mb-4">Order Summary</h4>
+                
+                <div class="mb-4" style="max-height: 200px; overflow-y: auto;">
+                    {% for item in cart_items %}
+                    <div class="d-flex align-items-center gap-3 mb-3 pb-3 border-bottom">
+                        <div style="width: 50px; height: 50px; flex-shrink: 0;">
+                            <img src="{{ item.product.image.url }}" class="w-100 h-100 object-fit-cover rounded-2">
+                        </div>
+                        <div class="flex-grow-1 overflow-hidden">
+                            <div class="fw-medium text-truncate small">{{ item.product.name }}</div>
+                            <div class="text-muted smallest">Qty: {{ item.quantity }} × ₹{{ item.product.price }}</div>
+                        </div>
+                        <div class="fw-bold small ps-2">₹{{ item.total_price }}</div>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <div class="summary-item">
+                    <span class="text-muted">Subtotal</span>
+                    <span class="fw-medium">₹{{ grand_total }}</span>
+                </div>
+                <div class="summary-item">
+                    <span class="text-muted">Shipping Fee</span>
+                    <span class="text-success fw-bold">FREE</span>
+                </div>
+                
+                <hr style="opacity: 0.1; margin: 20px 0;">
+
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <span class="h5 fw-bold mb-0">Total Amount</span>
+                    <div class="text-end">
+                        <span class="h4 fw-bold mb-0" style="color: var(--blue);">₹{{ grand_total }}</span>
+                        <div class="smallest text-muted">Inclusive of all taxes</div>
+                    </div>
+                </div>
+
+                <button type="submit" form="checkout-form" class="btn btn-primary btn-lg w-100 fw-bold py-3 shadow-sm border-0" style="border-radius: 12px;">
+                    Place Order
+                </button>
+
+                <div class="mt-4 p-3 bg-light rounded-3">
+                    <div class="d-flex align-items-center gap-3 mb-2">
+                        <i class="fas fa-shield-alt text-success"></i>
+                        <span class="fw-bold smallest">100% Payment Protection</span>
+                    </div>
+                    <p class="smallest text-muted mb-0">Your payment information is processed securely. We do not store credit card details.</p>
+                </div>
+            </div>
+            
+            <a href="{% url 'cart_detail' %}" class="btn btn-link link-secondary text-decoration-none w-100 text-center small">
+                <i class="fas fa-arrow-left me-2"></i> Return to Cart
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Show check icon on selected address
+    const addressRadios = document.querySelectorAll('input[name="address_id"]');
+    addressRadios.forEach(radio => {
+        radio.addEventListener('change', () => {
+            document.querySelectorAll('.check-icon').forEach(icon => icon.style.display = 'none');
+            if (radio.checked) {
+                radio.closest('.card-body').querySelector('.check-icon').style.display = 'block';
+            }
+        });
+        if (radio.checked) {
+            radio.closest('.card-body').querySelector('.check-icon').style.display = 'block';
+        }
+    });
+</script>
+{% endblock %}

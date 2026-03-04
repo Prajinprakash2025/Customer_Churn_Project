@@ -1,0 +1,80 @@
+{% extends 'user/base_user.html' %}
+
+{% block title %}{{ category.name }} | ShopHub{% endblock %}
+
+{% block extra_css %}
+<style>
+    .cat-header {
+        background: linear-gradient(135deg, var(--blue), var(--purple));
+        color: white;
+        padding: 40px 20px;
+        border-radius: 16px;
+        margin-bottom: 32px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+    }
+    .cat-header h2 { font-size: 32px; font-weight: 800; margin-bottom: 8px; }
+    .cat-header p { font-size: 15px; opacity: 0.9; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="cat-header">
+    <h2>{{ category.icon|default:"📦" }} {{ category.name }}</h2>
+    <p>Explore premium products in this category</p>
+</div>
+
+<div class="products-row">
+    {% for product in products %}
+    <div class="p-card">
+        <a href="{% url 'product_detail' product.id %}" class="p-img">
+            {% if product.image %}
+                <img src="{{ product.image.url }}" alt="{{ product.name }}">
+            {% else %}
+                <div class="p-img-placeholder"><i class="fas fa-image"></i></div>
+            {% endif %}
+
+            <div class="badge-wrap">
+                {% if product.stock == 0 %}
+                <span class="badge badge-red">OOS</span>
+                {% else %}
+                <span class="badge" style="background:var(--blue-light);color:white;">Active</span>
+                {% endif %}
+            </div>
+            
+            <a href="{% if product.id in wishlist_products %}{% url 'remove_from_wishlist' product.id %}{% else %}{% url 'add_to_wishlist' product.id %}{% endif %}"
+               class="wish-btn {% if product.id in wishlist_products %}active{% endif %}"
+               style="z-index: 10;">
+                <i class="fas fa-heart"></i>
+            </a>
+
+            {% if product.stock == 0 %}
+            <div class="oos-overlay">Out of Stock</div>
+            {% endif %}
+        </a>
+
+        <div class="p-body">
+            <a href="{% url 'product_detail' product.id %}" class="p-name">{{ product.name }}</a>
+            <div class="p-pricing">
+                <div class="p-price-now">₹{{ product.price }}</div>
+            </div>
+            <form method="POST" action="{% url 'cart_add' product.id %}">
+                {% csrf_token %}
+                <button type="submit" class="add-btn" {% if product.stock == 0 %}disabled{% endif %}>
+                    <i class="fas fa-cart-plus"></i>
+                    {% if product.stock > 0 %}Add to Cart{% else %}Out of Stock{% endif %}
+                </button>
+            </form>
+        </div>
+    </div>
+    {% empty %}
+    <div style="grid-column:1/-1;text-align:center;padding:60px;color:#9CA3AF;">
+        <i class="fas fa-box-open" style="font-size:48px;margin-bottom:16px;display:block;"></i>
+        <p style="font-size:16px;">No products found in this category</p>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

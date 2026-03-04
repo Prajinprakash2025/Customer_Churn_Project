@@ -1,0 +1,60 @@
+{% extends 'user/base_user.html' %}
+
+{% block title %}Predict Customer Churn - ShopHub{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-6">
+            <div class="card border-0 shadow-lg p-5" style="border-radius: 24px; background: white;">
+                <div class="text-center mb-5">
+                    <div class="bg-blue bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-4" style="width: 80px; height: 80px; color: var(--blue);">
+                        <i class="fa-solid fa-file-csv fa-2x"></i>
+                    </div>
+                    <h2 class="fw-bold">Churn Prediction</h2>
+                    <p class="text-muted">Upload a CSV file containing customer data to predict churn probabilities.</p>
+                </div>
+
+                {% if error %}
+                <div class="alert alert-danger border-0 shadow-sm rounded-3 mb-4 d-flex align-items-center gap-3">
+                    <i class="fa-solid fa-circle-exclamation"></i>
+                    <div>{{ error }}</div>
+                </div>
+                {% endif %}
+
+                <form method="post" enctype="multipart/form-data" class="space-y-4">
+                    {% csrf_token %}
+                    <div class="mb-4">
+                        <label for="file" class="form-label fw-bold small text-uppercase tracking-wider text-muted">Select CSV Data File</label>
+                        <input type="file" name="file" id="file" class="form-control form-control-lg border-2 shadow-none" style="border-radius: 12px; border-style: dashed;" required>
+                        <div class="form-text mt-2 small">Supported format: .csv only</div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-lg w-100 fw-bold border-0 py-3 shadow-sm hover-up" style="border-radius: 12px; background: var(--blue);">
+                        <i class="fa-solid fa-wand-magic-sparkles me-2"></i> Run Prediction
+                    </button>
+                </form>
+
+                <div class="mt-5 pt-4 border-top">
+                    <h6 class="fw-bold mb-3 small text-uppercase text-muted">Required Columns in CSV:</h6>
+                    <div class="d-flex flex-wrap gap-2 text-muted tiny">
+                        <span class="badge bg-light text-dark fw-medium p-2">Tenure_Months</span>
+                        <span class="badge bg-light text-dark fw-medium p-2">Purchase_Frequency</span>
+                        <span class="badge bg-light text-dark fw-medium p-2">Avg_Order_Value</span>
+                        <span class="badge bg-light text-dark fw-medium p-2">Total_Spend</span>
+                        <span class="badge bg-light text-dark fw-medium p-2">Last_Purchase_Days</span>
+                        <span class="badge bg-light text-dark fw-medium p-2">Website_Visits</span>
+                        <span class="badge bg-light text-dark fw-medium p-2">Discount_Usage</span>
+                        <span class="badge bg-light text-dark fw-medium p-2">Support_Tickets</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .hover-up:hover { transform: translateY(-2px); transition: all 0.2s; }
+    .tiny { font-size: 11px; }
+</style>
+{% endblock %}

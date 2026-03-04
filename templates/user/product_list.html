@@ -1,0 +1,150 @@
+{% extends 'user/base_user.html' %}
+
+{% block title %}ShopHub | Online Shopping{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Custom styles for Hero and Promo areas that are specific to the Home page */
+    .hero-area { display: grid; grid-template-columns: 1fr 300px; gap: 16px; margin-bottom: 32px; }
+    .hero-carousel { position: relative; border-radius: 16px; overflow: hidden; height: 320px; background: var(--blue); }
+    .hero-slide { position: absolute; inset: 0; background-size: cover; background-position: center; opacity: 0; transition: opacity 0.6s ease; display: flex; align-items: center; }
+    .hero-slide.active { opacity: 1; }
+    .hero-text { position: relative; z-index: 2; padding: 40px; color: white; }
+    .hero-text h2 { font-size: 36px; font-weight: 800; line-height: 1.2; margin-bottom: 8px; }
+    .hero-btn { display: inline-block; background: var(--orange); color: white; padding: 12px 28px; border-radius: 8px; font-weight: 700; font-size: 14px; transition: all 0.2s; text-decoration: none; }
+    
+    /* Side banners */
+    .side-banners { display: flex; flex-direction: column; gap: 12px; }
+    .side-banner { flex: 1; border-radius: 12px; overflow: hidden; position: relative; display: flex; align-items: flex-end; background-size: cover; background-position: center; }
+    .side-banner-overlay { position: absolute; inset: 0; background: linear-gradient(0deg, rgba(0,0,0,0.6) 0%, transparent 60%); }
+    .side-banner-text { position: relative; z-index: 2; padding: 14px 16px; color: white; }
+    .side-banner-text strong { display: block; font-size: 15px; font-weight: 700; }
+    .side-banner-text span { font-size: 12px; opacity: 0.85; }
+
+    .promo-strip { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 40px; }
+    .promo-card { background: white; border-radius: 12px; padding: 20px; display: flex; align-items: center; gap: 14px; border: 1px solid #F0F0F5; }
+    .promo-icon { width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px; }
+
+    .section-hd { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; }
+    .section-hd h2 { font-size: 20px; font-weight: 700; color: #111; }
+    .view-all { font-size: 13px; font-weight: 600; color: var(--blue); text-decoration: none; }
+
+    @media (max-width: 1024px) {
+        .hero-area { grid-template-columns: 1fr; }
+        .side-banners { flex-direction: row; height: 130px; }
+        .side-banner { min-height: 130px; }
+        .promo-strip { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 640px) {
+        .hero-carousel { height: 240px; }
+        .side-banners { display: none; }
+        .products-row { grid-template-columns: repeat(2, 1fr); }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Note: Topbar and Catbar could be moved to base if needed, keeping here for now -->
+<div class="hero-area">
+    <div class="hero-carousel">
+        <div id="heroInner">
+            {% for banner in banners %}
+            <div class="hero-slide {% if forloop.first %}active{% endif %}" style="background-image: url('{{ banner.image.url }}');">
+                <div class="hero-text">
+                    <h2>{{ banner.title|linebreaksbr }}</h2>
+                    <p>{{ banner.subtitle }}</p>
+                    <a href="{{ banner.button_url }}" class="hero-btn">{{ banner.button_text }}</a>
+                </div>
+            </div>
+            {% empty %}
+            <div class="hero-slide active" style="background: linear-gradient(135deg, #1E40AF 0%, #7C3AED 100%);">
+                <div class="hero-text">
+                    <h2>Discover ShopHub</h2>
+                    <p>Your one stop destination for everything.</p>
+                    <a href="#all-products" class="hero-btn">Start Shopping →</a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Side banners -->
+    <div class="side-banners">
+        <div class="side-banner" style="background-image: url('/media/banners/side_mobile.png');">
+            <div class="side-banner-overlay"></div>
+            <div class="side-banner-text">
+                <strong>📱 Mobiles & Tablets</strong>
+                <span>Up to 40% off on smartphones</span>
+            </div>
+        </div>
+        <div class="side-banner" style="background-image: url('/media/banners/side_fashion.png');">
+            <div class="side-banner-overlay"></div>
+            <div class="side-banner-text">
+                <strong>👗 Fashion Sale</strong>
+                <span>Top brands, huge discounts</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="promo-strip">
+    <div class="promo-card"><div class="promo-icon" style="background:#EFF6FF;">🚚</div><div><h4>Free Delivery</h4><p>On orders above ₹499</p></div></div>
+    <div class="promo-card"><div class="promo-icon" style="background:#F0FDF4;">🔄</div><div><h4>Easy Returns</h4><p>30-day returns</p></div></div>
+    <div class="promo-card"><div class="promo-icon" style="background:#FFF7ED;">🔒</div><div><h4>Secure Payment</h4><p>100% protection</p></div></div>
+    <div class="promo-card"><div class="promo-icon" style="background:#FDF4FF;">🎁</div><div><h4>Gift Cards</h4><p>Share the joy</p></div></div>
+</div>
+
+<div class="section-hd">
+    <h2>⭐ <span>Featured</span> Products</h2>
+    <a href="#all-products" class="view-all">View All <i class="fas fa-chevron-right"></i></a>
+</div>
+
+<div class="products-row">
+    {% for product in products|slice:":6" %}
+    <div class="p-card">
+        <a href="{% url 'product_detail' product.id %}" class="p-img">
+            {% if product.image %}<img src="{{ product.image.url }}" alt="{{ product.name }}">{% else %}<div class="p-img-placeholder"><i class="fas fa-image"></i></div>{% endif %}
+            <div class="badge-wrap"><span class="badge badge-red">-35%</span></div>
+            <a href="{% if product.id in wishlist_products %}{% url 'remove_from_wishlist' product.id %}{% else %}{% url 'add_to_wishlist' product.id %}{% endif %}" class="wish-btn {% if product.id in wishlist_products %}active{% endif %}"><i class="fas fa-heart"></i></a>
+        </a>
+        <div class="p-body">
+            {% if product.category %}<div class="p-cat">{{ product.category.name }}</div>{% endif %}
+            <a href="{% url 'product_detail' product.id %}" class="p-name">{{ product.name }}</a>
+            <div class="p-pricing"><div class="p-price-now">₹{{ product.price }}</div></div>
+            <form method="POST" action="{% url 'cart_add' product.id %}">
+                {% csrf_token %}
+                <button type="submit" class="add-btn" {% if product.stock == 0 %}disabled{% endif %}>
+                    <i class="fas fa-cart-plus"></i> {% if product.stock > 0 %}Add to Cart{% else %}Out of Stock{% endif %}
+                </button>
+            </form>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<div id="all-products" class="section-hd">
+    <h2>🛍️ All <span>Products</span></h2>
+</div>
+
+<div class="products-row">
+    {% for product in products %}
+    <div class="p-card">
+        <a href="{% url 'product_detail' product.id %}" class="p-img">
+            {% if product.image %}<img src="{{ product.image.url }}" alt="{{ product.name }}">{% else %}<div class="p-img-placeholder"><i class="fas fa-image"></i></div>{% endif %}
+            <div class="badge-wrap"><span class="badge badge-red">-10%</span></div>
+        </a>
+        <div class="p-body">
+            {% if product.category %}<div class="p-cat">{{ product.category.name }}</div>{% endif %}
+            <a href="{% url 'product_detail' product.id %}" class="p-name">{{ product.name }}</a>
+            <div class="p-pricing"><div class="p-price-now">₹{{ product.price }}</div></div>
+            <form method="POST" action="{% url 'cart_add' product.id %}">
+                {% csrf_token %}
+                <button type="submit" class="add-btn" {% if product.stock == 0 %}disabled{% endif %}>
+                    <i class="fas fa-cart-plus"></i> {% if product.stock > 0 %}Add to Cart{% else %}Out of Stock{% endif %}
+                </button>
+            </form>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

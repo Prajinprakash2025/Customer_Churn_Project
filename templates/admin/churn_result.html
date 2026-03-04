@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Churn Prediction Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+</head>
+<body class="bg-gray-100">
+
+<div class="max-w-6xl mx-auto mt-12 bg-white shadow-lg rounded-xl p-8">
+
+    <div class="d-flex justify-content-between align-items-center mb-8">
+        <h2 class="text-3xl font-bold text-gray-800">
+            📊 Customer Churn Dashboard
+        </h2>
+    </div>
+
+    {% if error %}
+    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-8" role="alert">
+        <strong class="font-bold">Error!</strong>
+        <span class="block sm:inline">{{ error }}</span>
+    </div>
+    {% endif %}
+
+   
+    <!-- Summary Section -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-10">
+        <div class="bg-blue-50 p-6 rounded-xl shadow-sm text-center border-t-4 border-blue-500">
+            <h3 class="text-lg font-semibold text-blue-600">Total Customers</h3>
+            <p class="text-3xl font-bold">{{ total_customers }}</p>
+        </div>
+
+        <div class="bg-red-50 p-6 rounded-xl shadow-sm text-center border-t-4 border-red-500">
+            <h3 class="text-lg font-semibold text-red-600">High Risk</h3>
+            <p class="text-3xl font-bold">{{ high_count }}</p>
+        </div>
+
+        <div class="bg-yellow-50 p-6 rounded-xl shadow-sm text-center border-t-4 border-yellow-500">
+            <h3 class="text-lg font-semibold text-yellow-600">Medium Risk</h3>
+            <p class="text-3xl font-bold">{{ medium_count }}</p>
+        </div>
+
+        <div class="bg-green-50 p-6 rounded-xl shadow-sm text-center border-t-4 border-green-500">
+            <h3 class="text-lg font-semibold text-green-600">Low Risk</h3>
+            <p class="text-3xl font-bold">{{ low_count }}</p>
+        </div>
+    </div>
+
+    <!-- Users Table -->
+    <div class="overflow-x-auto bg-white rounded-lg">
+        <table class="w-full border-collapse text-sm">
+            <thead>
+                <tr class="bg-gray-50 text-left border-b">
+                    <th class="p-4 font-bold text-gray-700 uppercase tracking-wider">Username</th>
+                    <th class="p-4 font-bold text-gray-700 uppercase tracking-wider">Email</th>
+                    <th class="p-4 font-bold text-gray-700 uppercase tracking-wider">Orders</th>
+                    <th class="p-4 font-bold text-gray-700 uppercase tracking-wider">Total Spent</th>
+                    <th class="p-4 font-bold text-gray-700 uppercase tracking-wider">Churn %</th>
+                    <th class="p-4 font-bold text-gray-700 uppercase tracking-wider">Risk Level</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in results %}
+                <tr class="border-b hover:bg-gray-50 transition">
+                    <td class="p-4 font-semibold text-gray-800">{{ user.username }}</td>
+                    <td class="p-4 text-gray-600">{{ user.email }}</td>
+                    <td class="p-4">{{ user.orders }}</td>
+                    <td class="p-4 font-semibold">₹{{ user.total_spent }}</td>
+                    <td class="p-4">
+                        <div class="flex items-center">
+                            <span class="font-bold text-blue-600 mr-2">{{ user.probability }}%</span>
+                            <div class="w-24 bg-gray-200 rounded-full h-2">
+                                <div class="bg-blue-600 h-2 rounded-full" style="width: {{ user.probability }}%"></div>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="p-4">
+                        {% if user.risk == "High Risk" %}
+                            <span class="px-3 py-1 bg-red-100 text-red-600 rounded-full font-bold">
+                                High Risk
+                            </span>
+                        {% elif user.risk == "Medium Risk" %}
+                            <span class="px-3 py-1 bg-yellow-100 text-yellow-600 rounded-full font-bold">
+                                Medium Risk
+                            </span>
+                        {% else %}
+                            <span class="px-3 py-1 bg-green-100 text-green-600 rounded-full font-bold">
+                                Low Risk
+                            </span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" class="text-center p-12 text-gray-500">
+                        <i class="fa-solid fa-users-slash text-4xl mb-4 block"></i>
+                        No customers with order history found.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="mt-10 flex justify-center gap-4">
+        <a href="/management/"
+           class="px-6 py-3 bg-gray-600 text-white rounded-lg font-bold hover:bg-gray-700 transition flex items-center shadow-md">
+           <i class="fa-solid fa-gauge-high mr-2"></i> Admin Dashboard
+        </a>
+        <a href="/"
+           class="px-6 py-3 bg-blue-600 text-white rounded-lg font-bold hover:bg-blue-700 transition flex items-center shadow-md">
+           <i class="fa-solid fa-house mr-2"></i> Visit Shop
+        </a>
+    </div>
+
+</div>
+
+</body>
+</html>

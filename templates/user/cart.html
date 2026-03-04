@@ -1,0 +1,128 @@
+{% extends 'user/base_user.html' %}
+
+{% block title %}My Shopping Cart - ShopHub{% endblock %}
+
+{% block content %}
+<div class="container py-5" style="min-height: 70vh;">
+    <div class="d-flex align-items-center mb-4 gap-2">
+        <div style="width: 4px; height: 32px; background: var(--blue); border-radius: 2px;"></div>
+        <h2 class="fw-bold mb-0">Shopping Cart</h2>
+    </div>
+
+    {% if cart_items %}
+    <div class="row g-4">
+        <!-- LEFT SIDE - Cart Items -->
+        <div class="col-lg-8">
+            <div class="d-flex flex-column gap-3">
+                {% for item in cart_items %}
+                <div class="card border-0 shadow-sm p-3" style="border-radius: 16px;">
+                    <div class="row g-3 align-items-center">
+                        <!-- Product Image -->
+                        <div class="col-auto">
+                            <div style="width: 100px; height: 100px; overflow: hidden; border-radius: 12px;">
+                                <img src="{{ item.product.image.url }}" class="w-100 h-100 object-fit-cover">
+                            </div>
+                        </div>
+
+                        <!-- Product Details -->
+                        <div class="col">
+                            <h5 class="fw-bold mb-1">{{ item.product.name }}</h5>
+                            <div class="d-flex align-items-center gap-2 mb-2">
+                                <span class="badge bg-success bg-opacity-10 text-success rounded-pill fw-medium" style="font-size: 11px;">In Stock</span>
+                                <span class="text-muted" style="font-size: 13px;">Price: ₹{{ item.product.price }}</span>
+                            </div>
+                            
+                            <div class="d-flex align-items-center justify-content-between mt-auto">
+                                <div class="d-flex align-items-center gap-3">
+                                    <span class="text-muted small">Qty:</span>
+                                    <div class="d-flex align-items-center bg-light rounded-pill p-1" style="border: 1px solid #eee;">
+                                        <a href="{% url 'cart_update' item.product.id 'decrement' %}" 
+                                           class="btn btn-sm rounded-circle d-flex align-items-center justify-content-center" 
+                                           style="width: 28px; height: 28px; background: white; color: var(--blue); border: 1px solid #eee; transition: all 0.2s;">
+                                            <i class="fa-solid fa-minus" style="font-size: 10px;"></i>
+                                        </a>
+                                        <span class="fw-bold px-3" style="min-width: 40px; text-align: center;">{{ item.quantity }}</span>
+                                        <a href="{% url 'cart_update' item.product.id 'increment' %}" 
+                                           class="btn btn-sm rounded-circle d-flex align-items-center justify-content-center" 
+                                           style="width: 28px; height: 28px; background: white; color: var(--blue); border: 1px solid #eee; transition: all 0.2s;">
+                                            <i class="fa-solid fa-plus" style="font-size: 10px;"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                                <a href="{% url 'cart_remove' item.product.id %}" class="text-danger text-decoration-none small fw-medium hover-opacity">
+                                    <i class="fa-solid fa-trash-can me-1"></i> Remove
+                                </a>
+                            </div>
+                        </div>
+
+                        <!-- Price Section -->
+                        <div class="col-auto border-start ps-4 text-end">
+                            <span class="text-muted smaller d-block mb-1">Total</span>
+                            <span class="h5 fw-bold mb-0">₹{{ item.total_price }}</span>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- RIGHT SIDE - Order Summary -->
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm p-4 sticky-top" style="border-radius: 20px; top: 100px; background: #fff;">
+                <h4 class="fw-bold mb-4">Order Summary</h4>
+                
+                <div class="d-flex justify-content-between mb-2 text-muted">
+                    <span>Subtotal</span>
+                    <span>₹{{ grand_total }}</span>
+                </div>
+
+                <div class="d-flex justify-content-between mb-3">
+                    <span class="text-muted">Shipping</span>
+                    <span class="text-success fw-medium">Free</span>
+                </div>
+
+                <hr style="opacity: 0.1; margin: 20px 0;">
+
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <span class="h5 fw-bold mb-0">Grand Total</span>
+                    <span class="h4 fw-bold mb-0" style="color: var(--blue);">₹{{ grand_total }}</span>
+                </div>
+
+                <div class="d-flex flex-column gap-3">
+                    <a href="{% url 'checkout' %}" class="btn btn-primary btn-lg w-100 fw-bold border-0 shadow-sm py-3" style="border-radius: 12px;">
+                        Proceed to Checkout
+                    </a>
+                    <a href="{% url 'cart_clear' %}" class="btn btn-link link-danger text-decoration-none small text-center">
+                        <i class="fa-solid fa-broom me-1"></i> Clear Cart
+                    </a>
+                </div>
+                
+                <div class="mt-4 p-3 bg-light rounded-3 d-flex align-items-center gap-3">
+                    <div class="bg-white rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; color: var(--blue);">
+                        <i class="fa-solid fa-shield-halved"></i>
+                    </div>
+                    <div>
+                        <div class="fw-bold smaller">Secure Checkout</div>
+                        <div class="text-muted smaller">Encrypted transaction</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% else %}
+    <div class="text-center py-5">
+        <div class="mb-4">
+            <div class="bg-light rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 120px; height: 120px;">
+                <i class="fa-solid fa-cart-shopping fa-3x text-muted"></i>
+            </div>
+        </div>
+        <h3 class="fw-bold">Your Cart is Empty</h3>
+        <p class="text-muted mb-4">Looks like you haven't added anything to your cart yet.</p>
+        <a href="/" class="btn btn-primary px-5 py-3 rounded-pill fw-bold border-0 shadow-sm">
+            Start Shopping
+        </a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

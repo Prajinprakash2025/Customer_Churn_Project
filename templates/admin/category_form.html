@@ -1,0 +1,24 @@
+{% extends "admin/base_admin.html" %}
+{% block content %}
+
+<h3>{% if mode == 'edit' %}Edit{% else %}Add{% endif %} Category</h3>
+
+<form method="POST">
+    {% csrf_token %}
+
+    <div class="mb-3">
+        <label>Name</label>
+        <input type="text" name="name" class="form-control" value="{{ category.name|default:'' }}" required>
+    </div>
+
+    <div class="mb-3">
+        <label>Icon (Emoji)</label>
+        <input type="text" name="icon" class="form-control" value="{{ category.icon|default:'' }}" placeholder="Example: 💻">
+        <small>Paste emoji like 💻 📱 👕 🛒</small>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Save</button>
+    <a href="{% url 'manage_categories' %}" class="btn btn-secondary">Cancel</a>
+</form>
+
+{% endblock %}

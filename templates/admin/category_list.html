@@ -1,0 +1,47 @@
+{% extends "admin/base_admin.html" %}
+{% block content %}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Categories</h2>
+    <a href="{% url 'add_category' %}" class="btn btn-primary">Add Category</a>
+</div>
+
+<form method="POST" action="{% url 'bulk_delete_categories' %}" id="bulkDeleteForm">
+    {% csrf_token %}
+    <table class="table table-hover">
+        <thead>
+            <tr>
+                <th width="40"><input type="checkbox" id="selectAll"></th>
+                <th>Icon</th>
+                <th>Name</th>
+                <th class="text-end">Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for category in categories %}
+            <tr>
+                <td><input type="checkbox" name="category_ids" value="{{ category.id }}" class="cat-checkbox"></td>
+                <td style="font-size:20px;">{{ category.icon }}</td>
+                <td>{{ category.name }}</td>
+                <td class="text-end">
+                    <a href="{% url 'edit_category' category.id %}" class="btn btn-warning btn-sm">Edit</a>
+                    <a href="{% url 'delete_category' category.id %}" class="btn btn-danger btn-sm">Delete</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    
+    <button type="submit" class="btn btn-danger" onclick="return confirm('Delete selected categories?')">Delete Selected</button>
+</form>
+
+<script>
+    document.getElementById('selectAll').addEventListener('change', function() {
+        var checkboxes = document.querySelectorAll('.cat-checkbox');
+        for (var checkbox of checkboxes) {
+            checkbox.checked = this.checked;
+        }
+    });
+</script>
+
+{% endblock %}
