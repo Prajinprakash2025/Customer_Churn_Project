@@ -1,0 +1,60 @@
+{% extends 'admin/base_admin.html' %}
+
+{% block title %}Prediction Results | ShopHub Admin{% endblock %}
+{% block page_title %}Batch Prediction Results{% endblock %}
+
+{% block content %}
+<div class="d-flex align-items-center justify-content-between mb-4">
+    <div>
+        <h5 class="fw-bold mb-1">Analysis complete</h5>
+        <p class="text-muted small mb-0">{{ total }} customer records processed.</p>
+    </div>
+    <a href="{% url 'upload' %}" class="btn btn-outline-secondary btn-sm">
+        <i class="fa-solid fa-arrow-left me-2"></i>Upload another file
+    </a>
+    </div>
+
+<div class="card shadow-sm border-0">
+    <div class="table-responsive">
+        <table class="table align-middle mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th scope="col">Customer ID</th>
+                    <th scope="col" class="text-center">Churn Probability</th>
+                    <th scope="col" class="text-center">Risk Assessment</th>
+                    <th scope="col" class="text-end">Probability Meter</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for pred in predictions %}
+                <tr>
+                    <td class="fw-semibold">{{ pred.customer_id }}</td>
+                    <td class="text-center">
+                        <span class="fw-bold text-primary">{{ pred.probability }}%</span>
+                    </td>
+                    <td class="text-center">
+                        {% if pred.risk == "High Risk" %}
+                            <span class="badge bg-danger-subtle text-danger fw-bold px-3 py-2">High</span>
+                        {% elif pred.risk == "Medium Risk" %}
+                            <span class="badge bg-warning-subtle text-warning fw-bold px-3 py-2">Medium</span>
+                        {% else %}
+                            <span class="badge bg-success-subtle text-success fw-bold px-3 py-2">Low</span>
+                        {% endif %}
+                    </td>
+                    <td class="text-end" style="min-width: 220px;">
+                        <div class="d-inline-flex align-items-center gap-2 w-100">
+                            <div class="progress flex-fill" style="height: 8px;">
+                                <div class="progress-bar {% if pred.probability > 70 %}bg-danger{% elif pred.probability > 40 %}bg-warning{% else %}bg-success{% endif %}"
+                                     role="progressbar" style="width: {{ pred.probability }}%;"
+                                     aria-valuenow="{{ pred.probability }}" aria-valuemin="0" aria-valuemax="100"></div>
+                            </div>
+                            <span class="small text-muted">{{ pred.probability }}%</span>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

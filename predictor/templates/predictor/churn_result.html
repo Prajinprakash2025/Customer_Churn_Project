@@ -1,0 +1,110 @@
+{% extends 'admin/base_admin.html' %}
+
+{% block title %}Churn Dashboard | ShopHub Admin{% endblock %}
+{% block page_title %}Churn Dashboard{% endblock %}
+
+{% block content %}
+<div class="d-flex align-items-center justify-content-between mb-4">
+    <div>
+        <h5 class="mb-1 fw-bold">Customer churn overview</h5>
+        <p class="text-muted small mb-0">Scores generated from recent orders and spending patterns.</p>
+    </div>
+    <div class="d-flex gap-2">
+        <a href="{% url 'management_dashboard' %}" class="btn btn-outline-secondary btn-sm">
+            <i class="fa-solid fa-gauge-high me-1"></i>Dashboard
+        </a>
+        <a href="/" class="btn btn-primary btn-sm" target="_blank">
+            <i class="fa-solid fa-eye me-1"></i>Visit Shop
+        </a>
+    </div>
+</div>
+
+{% if error %}
+<div class="alert alert-danger d-flex align-items-center" role="alert">
+    <i class="fa-solid fa-triangle-exclamation me-2"></i>
+    <div>{{ error }}</div>
+</div>
+{% endif %}
+
+<div class="row g-3 mb-4">
+    <div class="col-md-3">
+        <div class="card p-3 h-100 border-start border-4 border-primary shadow-sm">
+            <span class="text-muted text-uppercase small fw-bold">Total Customers</span>
+            <h3 class="fw-bold mb-0">{{ total_customers }}</h3>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card p-3 h-100 border-start border-4 border-danger shadow-sm">
+            <span class="text-muted text-uppercase small fw-bold">High Risk</span>
+            <h3 class="fw-bold text-danger mb-0">{{ high_count }}</h3>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card p-3 h-100 border-start border-4 border-warning shadow-sm">
+            <span class="text-muted text-uppercase small fw-bold">Medium Risk</span>
+            <h3 class="fw-bold text-warning mb-0">{{ medium_count }}</h3>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card p-3 h-100 border-start border-4 border-success shadow-sm">
+            <span class="text-muted text-uppercase small fw-bold">Low Risk</span>
+            <h3 class="fw-bold text-success mb-0">{{ low_count }}</h3>
+        </div>
+    </div>
+</div>
+
+<div class="card shadow-sm">
+    <div class="card-header bg-white d-flex align-items-center justify-content-between">
+        <span class="fw-bold">Customers ranked by churn probability</span>
+        <span class="text-muted small">{{ total_customers }} analysed</span>
+    </div>
+    <div class="table-responsive">
+        <table class="table align-middle mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th scope="col">Username</th>
+                    <th scope="col">Email</th>
+                    <th scope="col">Orders</th>
+                    <th scope="col">Total Spent</th>
+                    <th scope="col">Churn %</th>
+                    <th scope="col">Risk Level</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in results %}
+                <tr>
+                    <td class="fw-semibold">{{ user.username }}</td>
+                    <td class="text-muted">{{ user.email }}</td>
+                    <td>{{ user.orders }}</td>
+                    <td class="fw-semibold">&#8377;{{ user.total_spent }}</td>
+                    <td style="min-width: 160px;">
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="fw-bold text-primary">{{ user.probability }}%</span>
+                            <div class="progress flex-fill" style="height: 6px;">
+                                <div class="progress-bar bg-primary" role="progressbar" style="width: {{ user.probability }}%;" aria-valuenow="{{ user.probability }}" aria-valuemin="0" aria-valuemax="100"></div>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        {% if user.risk == "High Risk" %}
+                            <span class="badge bg-danger-subtle text-danger fw-bold px-3 py-2">High</span>
+                        {% elif user.risk == "Medium Risk" %}
+                            <span class="badge bg-warning-subtle text-warning fw-bold px-3 py-2">Medium</span>
+                        {% else %}
+                            <span class="badge bg-success-subtle text-success fw-bold px-3 py-2">Low</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" class="text-center py-5 text-muted">
+                        <i class="fa-solid fa-users-slash fa-lg mb-2 d-block"></i>
+                        No customers with order history found.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

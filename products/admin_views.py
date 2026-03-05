@@ -3,9 +3,9 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from .models import Product, Category
 from orders.models import Order
-from django.db.models import Sum, F
+from django.db.models import Sum, F, Count
 
-@staff_member_required(login_url='/accounts/management-login/')
+@staff_member_required(login_url='/accounts/admin-login/')
 def admin_dashboard(request):
     from orders.models import OrderItem
     # Total revenue across all orders
@@ -25,12 +25,12 @@ def admin_dashboard(request):
         "recent_orders": recent_orders,
     })
 
-@staff_member_required(login_url='/accounts/management-login/')
+@staff_member_required(login_url='/accounts/admin-login/')
 def admin_products(request):
     products = Product.objects.all().order_by("-id")
     return render(request, "admin/products_list.html", {"products": products})
 
-@staff_member_required(login_url='/accounts/management-login/')
+@staff_member_required(login_url='/accounts/admin-login/')
 def admin_product_add(request):
     categories = Category.objects.all()
 
@@ -54,7 +54,7 @@ def admin_product_add(request):
         "mode": "add"
     })
 
-@staff_member_required(login_url='/accounts/management-login/')
+@staff_member_required(login_url='/accounts/admin-login/')
 def admin_product_edit(request, pk):
     product = get_object_or_404(Product, pk=pk)
     categories = Category.objects.all()
@@ -79,26 +79,27 @@ def admin_product_edit(request, pk):
         "mode": "edit"
     })
 
-@staff_member_required(login_url='/accounts/management-login/')
+@staff_member_required(login_url='/accounts/admin-login/')
 def admin_product_delete(request, pk):
     product = get_object_or_404(Product, pk=pk)
     product.delete()
     messages.success(request, "Product deleted successfully.")
     return redirect("manage_products")
 
-@staff_member_required(login_url='/accounts/management-login/')
+@staff_member_required(login_url='/accounts/admin-login/')
 def admin_orders(request):
     orders = Order.objects.annotate(
-        total_price=Sum(F('items__price') * F('items__qty'))
+        total_price=Sum(F('items__price') * F('items__qty')),
+        items_count=Count('items')
     ).order_by("-id")
     return render(request, "admin/orders_list.html", {"orders": orders})
 
-@staff_member_required(login_url='/accounts/management-login/')
+@staff_member_required(login_url='/accounts/admin-login/')
 def admin_category_list(request):
     categories = Category.objects.all()
     return render(request, "admin/category_list.html", {"categories": categories})
 
-@staff_member_required(login_url='/accounts/management-login/')
+@staff_member_required(login_url='/accounts/admin-login/')
 def admin_category_add(request):
     if request.method == "POST":
         name = request.POST.get("name")
@@ -111,7 +112,7 @@ def admin_category_add(request):
 
     return render(request, "admin/category_form.html", {"mode": "add"})
 
-@staff_member_required(login_url='/accounts/management-login/')
+@staff_member_required(login_url='/accounts/admin-login/')
 def admin_category_edit(request, pk):
     category = get_object_or_404(Category, pk=pk)
     if request.method == "POST":
@@ -123,7 +124,7 @@ def admin_category_edit(request, pk):
 
     return render(request, "admin/category_form.html", {"category": category, "mode": "edit"})
 
-@staff_member_required(login_url='/accounts/management-login/')
+@staff_member_required(login_url='/accounts/admin-login/')
 def admin_category_delete(request, pk):
     category = get_object_or_404(Category, pk=pk)
     if request.method == "POST":
@@ -132,7 +133,7 @@ def admin_category_delete(request, pk):
         return redirect('manage_categories')
     return render(request, 'admin/category_confirm_delete.html', {'category': category})
 
-@staff_member_required(login_url='/accounts/management-login/')
+@staff_member_required(login_url='/accounts/admin-login/')
 def admin_bulk_delete_products(request):
     if request.method == "POST":
         product_ids = request.POST.getlist('product_ids')
@@ -143,7 +144,7 @@ def admin_bulk_delete_products(request):
             messages.warning(request, "No products selected.")
     return redirect("manage_products")
 
-@staff_member_required(login_url='/accounts/management-login/')
+@staff_member_required(login_url='/accounts/admin-login/')
 def admin_bulk_delete_categories(request):
     if request.method == "POST":
         category_ids = request.POST.getlist('category_ids')
@@ -153,3 +154,4 @@ def admin_bulk_delete_categories(request):
         else:
             messages.warning(request, "No categories selected.")
     return redirect("manage_categories")
+

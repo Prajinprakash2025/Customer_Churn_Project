@@ -4,7 +4,7 @@ import os
 from datetime import date
 from django.conf import settings
 from django.shortcuts import render
-from django.contrib.auth.decorators import login_required
+from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth.models import User
 from orders.models import Order
 from .forms import UploadFileForm
@@ -26,9 +26,10 @@ def load_ml_assets():
 
 model, scaler = load_ml_assets()
 
+@staff_member_required(login_url='/accounts/admin-login/')
 def upload_file(request):
     if not model or not scaler:
-        return render(request, "upload.html", {"error": "ML Model files not found."})
+        return render(request, "predictor/upload.html", {"error": "ML Model files not found."})
     
     if request.method == "POST":
         form = UploadFileForm(request.POST, request.FILES)
@@ -37,7 +38,7 @@ def upload_file(request):
             try:
                 original_df = pd.read_csv(file)
             except Exception:
-                return render(request, "upload.html", {
+                return render(request, "predictor/upload.html", {
                     "form": form,
                     "error": "Invalid file format."
                 })
@@ -70,18 +71,18 @@ def upload_file(request):
                     "risk": row["Risk_Level"]
                 })
 
-            return render(request, "result.html", {
+            return render(request, "predictor/result.html", {
                 "predictions": predictions,
                 "total": len(predictions)
             })
     else:
         form = UploadFileForm()
-    return render(request, "upload.html", {"form": form})
+    return render(request, "predictor/upload.html", {"form": form})
 
-@login_required
+@staff_member_required(login_url='/accounts/admin-login/')
 def auto_predict_user_churn(request):
     if not model or not scaler:
-        return render(request, "admin/churn_result.html", {"error": "ML Model files not found."})
+        return render(request, "predictor/churn_result.html", {"error": "ML Model files not found."})
 
     results = []
     users = User.objects.filter(is_superuser=False, is_staff=False).distinct()
@@ -152,7 +153,7 @@ def auto_predict_user_churn(request):
     medium_count = sum(1 for r in results if r["risk"] == "Medium Risk")
     low_count = sum(1 for r in results if r["risk"] == "Low Risk")
 
-    return render(request, "admin/churn_result.html", {
+    return render(request, "predictor/churn_result.html", {
         "results": results,
         "high_count": high_count,
         "medium_count": medium_count,

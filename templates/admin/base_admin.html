@@ -150,8 +150,11 @@
         </a>
 
         <div class="nav-section-title">AI & Analytics</div>
-        <a href="{% url 'auto_predict_user_churn' %}" class="nav-link {% if 'churn' in request.path %}active{% endif %}">
-            <i class="fa-solid fa-robot"></i> Churn Prediction
+        <a href="{% url 'upload' %}" class="nav-link {% if request.resolver_match.url_name == 'upload' %}active{% endif %}">
+            <i class="fa-solid fa-cloud-arrow-up"></i> Churn Prediction
+        </a>
+        <a href="{% url 'auto_predict_user_churn' %}" class="nav-link {% if request.resolver_match.url_name == 'auto_predict_user_churn' %}active{% endif %}">
+            <i class="fa-solid fa-user-check"></i> Churn Check
         </a>
 
         <div style="margin-top: auto; padding-bottom: 20px;">
