@@ -148,6 +148,10 @@
         <a href="{% url 'manage_orders' %}" class="nav-link {% if 'order' in request.path %}active{% endif %}">
             <i class="fa-solid fa-cart-shopping"></i> Orders
         </a>
+        <a href="{% url 'seller_requests' %}" 
+        class="nav-link {% if 'seller-requests' in request.path %}active{% endif %}">
+            <i class="fa-solid fa-store"></i> Seller Requests
+        </a>
 
         <div class="nav-section-title">AI & Analytics</div>
         <a href="{% url 'upload' %}" class="nav-link {% if request.resolver_match.url_name == 'upload' %}active{% endif %}">

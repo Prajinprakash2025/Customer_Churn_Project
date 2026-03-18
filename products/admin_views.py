@@ -155,3 +155,30 @@ def admin_bulk_delete_categories(request):
             messages.warning(request, "No categories selected.")
     return redirect("manage_categories")
 
+
+from django.shortcuts import render,redirect
+from django.contrib.admin.views.decorators import staff_member_required
+from products.models import SellerRequest
+
+
+@staff_member_required(login_url='/accounts/management-login/')
+def seller_requests(request):
+
+    sellers = SellerRequest.objects.all()
+
+    return render(request,"admin/seller_requests.html",{
+        "sellers":sellers
+    })
+
+
+from django.shortcuts import redirect, get_object_or_404
+from .models import SellerRequest
+
+def approve_seller(request, id):
+
+    seller = get_object_or_404(SellerRequest, id=id)
+
+    seller.approved = True
+    seller.save()
+
+    return redirect("seller_requests")

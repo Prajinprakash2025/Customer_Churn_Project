@@ -1,0 +1,250 @@
+{% extends "user/base_user.html" %}
+
+{% block title %}My Profile | ShopHub{% endblock %}
+
+{% block extra_css %}
+<style>
+
+.profile-grid{
+    display:grid;
+    grid-template-columns:260px 1fr;
+    gap:24px;
+}
+
+.profile-card{
+    background:white;
+    border-radius:14px;
+    padding:22px;
+    border:1px solid #EEF0F6;
+    box-shadow:0 6px 20px rgba(0,0,0,0.04);
+}
+
+.profile-avatar{
+    width:80px;
+    height:80px;
+    border-radius:50%;
+    background:linear-gradient(135deg,var(--blue),var(--purple));
+    color:white;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:30px;
+    font-weight:700;
+    margin-bottom:12px;
+}
+
+.profile-name{
+    font-size:18px;
+    font-weight:700;
+}
+
+.profile-email{
+    font-size:13px;
+    color:var(--gray-500);
+}
+
+.profile-menu{
+    margin-top:20px;
+}
+
+.profile-menu a{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:10px 12px;
+    border-radius:8px;
+    font-size:14px;
+    font-weight:600;
+    color:#374151;
+    transition:.2s;
+}
+
+.profile-menu a:hover{
+    background:#EFF6FF;
+    color:var(--blue);
+}
+
+.profile-menu i{
+    width:18px;
+}
+
+.profile-section-title{
+    font-size:20px;
+    font-weight:800;
+    margin-bottom:20px;
+}
+
+.profile-info-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:18px;
+}
+
+.info-box{
+    background:var(--gray-100);
+    border-radius:10px;
+    padding:14px;
+}
+
+.info-label{
+    font-size:11px;
+    color:var(--gray-500);
+    text-transform:uppercase;
+    font-weight:700;
+}
+
+.info-value{
+    font-size:15px;
+    font-weight:700;
+    margin-top:3px;
+}
+
+.action-buttons{
+    margin-top:20px;
+    display:flex;
+    gap:10px;
+}
+
+.btn-primary-soft{
+    background:var(--blue);
+    color:white;
+    border:none;
+    border-radius:8px;
+    padding:8px 16px;
+    font-weight:600;
+}
+
+.btn-primary-soft:hover{
+    background:#1d3799;
+}
+
+.btn-outline{
+    border:1px solid var(--gray-200);
+    border-radius:8px;
+    padding:8px 16px;
+    font-weight:600;
+}
+
+</style>
+{% endblock %}
+
+
+{% block content %}
+
+<div class="profile-grid">
+
+    <!-- LEFT PROFILE CARD -->
+    <div class="profile-card">
+
+        <div class="profile-avatar">
+            {{ request.user.username|first|upper }}
+        </div>
+
+        <div class="profile-name">
+            {{ request.user.username }}
+        </div>
+
+        <div class="profile-email">
+            {{ request.user.email }}
+        </div>
+
+
+        <div class="profile-menu">
+
+            <a href="{% url 'profile' %}">
+                <i class="fas fa-user"></i> My Profile
+            </a>
+
+            <a href="{% url 'wishlist_detail' %}">
+                <i class="far fa-heart"></i> Wishlist
+            </a>
+
+            <a href="{% url 'cart_detail' %}">
+                <i class="fas fa-shopping-cart"></i> Cart
+            </a>
+
+            <a href="#">
+                <i class="fas fa-box"></i> My Orders
+            </a>
+
+            <a href="{% url 'become_seller' %}">
+                <i class="fas fa-store"></i> Become Seller
+            </a>
+
+            <a href="{% url 'logout' %}">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </a>
+
+            {% if user.is_authenticated %}
+
+                {% if request.user.sellerrequest.approved %}
+                
+                    <a href="{% url 'seller_dashboard' %}">
+                        <i class="fa-solid fa-store"></i> Seller Dashboard
+                    </a>
+
+                {% else %}
+
+                    <a href="{% url 'become_seller' %}">
+                        <i class="fa-solid fa-store"></i> Become Seller
+                    </a>
+
+                {% endif %}
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
+
+
+    <!-- RIGHT CONTENT -->
+    <div class="profile-card">
+
+        <div class="profile-section-title">
+            Account Information
+        </div>
+
+        <div class="profile-info-grid">
+
+            <div class="info-box">
+                <div class="info-label">Username</div>
+                <div class="info-value">{{ request.user.username }}</div>
+            </div>
+
+            <div class="info-box">
+                <div class="info-label">Email</div>
+                <div class="info-value">{{ request.user.email }}</div>
+            </div>
+
+            <div class="info-box">
+                <div class="info-label">User ID</div>
+                <div class="info-value">{{ request.user.id }}</div>
+            </div>
+
+            <div class="info-box">
+                <div class="info-label">Joined</div>
+                <div class="info-value">{{ request.user.date_joined|date:"d M Y" }}</div>
+            </div>
+
+        </div>
+
+
+        <div class="action-buttons">
+
+            <button class="btn-primary-soft">
+                Edit Profile
+            </button>
+
+            <button class="btn-outline">
+                Change Password
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

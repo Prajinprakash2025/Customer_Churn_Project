@@ -11,5 +11,15 @@ urlpatterns = [
     path("wishlist/remove/<int:product_id>/", views.remove_from_wishlist, name="remove_from_wishlist"),
 
     path("category/<int:pk>/", views.category_products, name="category_products"),
+
+    path("become-seller/", views.become_seller, name="become_seller"),
+    path("seller/dashboard/", views.seller_dashboard, name="seller_dashboard"),
+    # Seller panel
+    path("seller/dashboard/", views.seller_dashboard, name="seller_dashboard"),
+    path("seller/add-products/", views.add_product, name="add_products"),
+    path("seller/products/", views.seller_products, name="seller_products"),
+    path("seller/orders/", views.seller_orders, name="seller_orders"),
+
+
 ]
 

@@ -14,4 +14,6 @@ urlpatterns = [
     path("categories/<int:pk>/edit/", admin_views.admin_category_edit, name="edit_category"),
     path("categories/<int:pk>/delete/", admin_views.admin_category_delete, name="delete_category"),
     path("categories/bulk-delete/", admin_views.admin_bulk_delete_categories, name="bulk_delete_categories"),
+    path("approve-seller/<int:id>/",admin_views.approve_seller,name="approve_seller"),
+    path("seller-requests/",admin_views.seller_requests,name="seller_requests"),
 ]

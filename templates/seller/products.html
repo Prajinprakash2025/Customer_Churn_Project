@@ -1,0 +1,59 @@
+{% extends "seller/base_seller.html" %}
+
+{% block content %}
+
+<div class="container mt-5">
+
+<a href="{% url 'seller_dashboard' %}">
+    <i class="fa-solid fa-arrow-left"></i> Back
+</a>
+
+<h2>My Products</h2>
+
+<table class="table table-bordered mt-4">
+
+<thead>
+<tr>
+<th>Image</th>
+<th>Name</th>
+<th>Price</th>
+</tr>
+</thead>
+
+<tbody>
+
+{% for product in products %}
+
+<tr>
+
+<td>
+<img src="{{ product.image.url }}" width="80">
+</td>
+
+<td>
+{{ product.name }}
+</td>
+
+<td>
+₹{{ product.price }}
+</td>
+
+</tr>
+
+{% empty %}
+
+<tr>
+<td colspan="3" class="text-center">
+No products yet
+</td>
+</tr>
+
+{% endfor %}
+
+</tbody>
+
+</table>
+
+</div>
+
+{% endblock %}

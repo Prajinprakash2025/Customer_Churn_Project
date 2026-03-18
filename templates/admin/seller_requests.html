@@ -1,0 +1,145 @@
+{% extends 'admin/base_admin.html' %}
+
+{% block title %}Seller Requests | ShopHub Admin{% endblock %}
+{% block page_title %}Seller Requests{% endblock %}
+
+{% block content %}
+
+<!-- Seller Stats -->
+<div class="row g-4 mb-4">
+
+    <div class="col-md-4">
+        <div class="card p-4 h-100 border-start border-primary border-4">
+            <div class="d-flex align-items-center justify-content-between mb-2">
+                <span class="text-muted small fw-bold text-uppercase">Total Requests</span>
+                <div class="bg-primary bg-opacity-10 text-primary p-2 rounded-3">
+                    <i class="fa-solid fa-store"></i>
+                </div>
+            </div>
+            <h3 class="fw-bold mb-1">{{ sellers|length }}</h3>
+            <span class="text-muted small">All seller applications</span>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card p-4 h-100 border-start border-warning border-4">
+            <div class="d-flex align-items-center justify-content-between mb-2">
+                <span class="text-muted small fw-bold text-uppercase">Pending Requests</span>
+                <div class="bg-warning bg-opacity-10 text-warning p-2 rounded-3">
+                    <i class="fa-solid fa-clock"></i>
+                </div>
+            </div>
+            <h3 class="fw-bold mb-1">
+                {{ sellers|dictsort:"is_approved"|length }}
+            </h3>
+            <span class="text-warning small fw-bold">Waiting for approval</span>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card p-4 h-100 border-start border-success border-4">
+            <div class="d-flex align-items-center justify-content-between mb-2">
+                <span class="text-muted small fw-bold text-uppercase">Approved Sellers</span>
+                <div class="bg-success bg-opacity-10 text-success p-2 rounded-3">
+                    <i class="fa-solid fa-check"></i>
+                </div>
+            </div>
+            <h3 class="fw-bold mb-1">
+                {{ approved_count }}
+            </h3>
+            <span class="text-success small fw-bold">Active sellers</span>
+        </div>
+    </div>
+
+</div>
+
+
+<!-- Seller Request Table -->
+
+<div class="card p-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h5 class="fw-bold mb-0">Seller Applications</h5>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-hover align-middle">
+
+            <thead class="text-muted small text-uppercase">
+                <tr>
+                    <th>User</th>
+                    <th>Store Name</th>
+                    <th>Phone</th>
+                    <th>Status</th>
+                    <th class="text-end">Action</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+                {% for seller in sellers %}
+
+                <tr>
+
+                    <td>
+                        <div class="fw-semibold">{{ seller.user.username }}</div>
+                        <div class="text-muted small">{{ seller.user.email }}</div>
+                    </td>
+
+                    <td class="fw-semibold">
+                        {{ seller.store_name }}
+                    </td>
+
+                    <td>
+                        {{ seller.phone }}
+                    </td>
+
+                    <td>
+                        {% if seller.approved %}
+                        <span class="badge bg-success bg-opacity-10 text-success rounded-pill px-3 py-2">
+                            Approved
+                        </span>
+                        {% else %}
+                        <span class="badge bg-warning bg-opacity-10 text-warning rounded-pill px-3 py-2">
+                            Pending
+                        </span>
+                        {% endif %}
+                    </td>
+
+                    <td class="text-end">
+
+                        {% if not seller.approved %}
+
+                        <a href="{% url 'approve_seller' seller.id %}" 
+                           class="btn btn-success btn-sm">
+                           <i class="fa-solid fa-check me-1"></i> Approve
+                        </a>
+
+                        {% else %}
+
+                        <span class="text-muted small">No action</span>
+
+                        {% endif %}
+
+                    </td>
+
+                </tr>
+
+                {% empty %}
+
+                <tr>
+                    <td colspan="5" class="text-center py-4 text-muted">
+                        No seller requests available
+                    </td>
+                </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+    </div>
+
+</div>
+
+{% endblock %}

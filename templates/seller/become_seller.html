@@ -1,0 +1,160 @@
+{% extends "user/base_user.html" %}
+
+{% block title %}Become a Seller | ShopHub{% endblock %}
+
+{% block extra_css %}
+<style>
+
+.seller-container{
+    max-width:720px;
+    margin:auto;
+}
+
+.seller-card{
+    background:white;
+    border-radius:14px;
+    padding:28px;
+    border:1px solid #EEF0F6;
+    box-shadow:0 8px 28px rgba(0,0,0,0.05);
+}
+
+.seller-title{
+    font-size:22px;
+    font-weight:800;
+    margin-bottom:6px;
+}
+
+.seller-sub{
+    font-size:13px;
+    color:var(--gray-500);
+    margin-bottom:22px;
+}
+
+.form-label{
+    font-size:12px;
+    font-weight:700;
+    text-transform:uppercase;
+    margin-bottom:6px;
+}
+
+.form-control{
+    height:44px;
+    border-radius:10px;
+    border:2px solid #E5E7EB;
+    font-size:14px;
+}
+
+.form-control:focus{
+    border-color:var(--blue);
+    box-shadow:none;
+}
+
+.submit-btn{
+    margin-top:18px;
+    width:100%;
+    height:46px;
+    background:var(--blue);
+    border:none;
+    border-radius:10px;
+    color:white;
+    font-weight:700;
+    font-size:14px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+    transition:.2s;
+}
+
+.submit-btn:hover{
+    background:#1d3799;
+}
+
+.seller-benefits{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:14px;
+    margin-top:22px;
+}
+
+.benefit-box{
+    background:#F9FAFF;
+    border-radius:10px;
+    padding:12px;
+    text-align:center;
+}
+
+.benefit-box i{
+    font-size:20px;
+    color:var(--blue);
+    margin-bottom:6px;
+}
+
+.benefit-box span{
+    font-size:12px;
+    font-weight:600;
+}
+
+</style>
+{% endblock %}
+
+
+
+{% block content %}
+
+<div class="seller-container">
+
+<div class="seller-card">
+
+<div class="seller-title">
+<i class="fas fa-store"></i> Become a Seller
+</div>
+
+<div class="seller-sub">
+Start selling your products on <b>ShopHub</b> and reach thousands of customers.
+</div>
+
+<form method="POST">
+{% csrf_token %}
+
+<div class="mb-3">
+<label class="form-label">Store Name</label>
+<input type="text" name="store_name" class="form-control" placeholder="Enter your store name" required>
+</div>
+
+<div class="mb-3">
+<label class="form-label">Phone Number</label>
+<input type="text" name="phone" class="form-control" placeholder="Enter phone number" required>
+</div>
+
+<button class="submit-btn" type="submit">
+<i class="fas fa-paper-plane"></i> Submit Seller Request
+</button>
+
+</form>
+
+
+<div class="seller-benefits">
+
+<div class="benefit-box">
+<i class="fas fa-users"></i>
+<span>Reach Customers</span>
+</div>
+
+<div class="benefit-box">
+<i class="fas fa-chart-line"></i>
+<span>Grow Business</span>
+</div>
+
+<div class="benefit-box">
+<i class="fas fa-rupee-sign"></i>
+<span>Earn Money</span>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+{% endblock %}

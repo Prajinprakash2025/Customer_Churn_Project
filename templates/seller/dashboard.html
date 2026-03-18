@@ -1,0 +1,188 @@
+{% extends "seller/base_seller.html" %}
+
+{% block title %}Seller Dashboard{% endblock %}
+
+{% block extra_css %}
+    .eyebrow {
+        font-size: 12px;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: var(--muted);
+        font-weight: 700;
+    }
+
+    .page-title {
+        font-weight: 800;
+        letter-spacing: -0.02em;
+    }
+
+    .stat-card {
+        background: #fff;
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        padding: 18px 18px;
+        box-shadow: 0 16px 40px rgba(15, 23, 42, 0.05);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 14px;
+        height: 100%;
+    }
+
+    .stat-icon {
+        width: 52px;
+        height: 52px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #fff;
+        box-shadow: 0 10px 24px rgba(15, 23, 42, 0.14);
+    }
+
+    .stat-meta {
+        font-size: 13px;
+        color: var(--muted);
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+    }
+
+    .stat-value {
+        font-size: 30px;
+        font-weight: 800;
+        color: var(--ink);
+        margin: 6px 0 0;
+    }
+
+    .quick-card,
+    .section-card {
+        border-radius: 14px;
+        border: 1px solid var(--border);
+        box-shadow: 0 14px 36px rgba(15, 23, 42, 0.06);
+    }
+
+    .quick-card h5,
+    .section-card h5 { font-weight: 800; }
+
+    .quick-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        border-radius: 12px;
+        padding: 12px 16px;
+        font-weight: 700;
+        border: 1px solid transparent;
+        transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .quick-btn:hover { transform: translateY(-1px); box-shadow: 0 10px 20px rgba(0, 0, 0, 0.12); }
+
+    .quick-btn.add { background: #2563eb; color: #fff; }
+    .quick-btn.products { background: #111827; color: #fff; }
+    .quick-btn.orders { background: #f59e0b; color: #1f2937; }
+
+    .table tbody tr:hover { background: #f8fafc; }
+
+    .empty-row { color: var(--muted); }
+{% endblock %}
+
+{% block content %}
+<div class="d-flex align-items-start justify-content-between flex-wrap gap-3 mb-4">
+    <div>
+        <div class="eyebrow">Overview</div>
+        <h1 class="page-title mb-1">Seller Dashboard</h1>
+        <p class="text-muted mb-0">Track catalog size, order volume and revenue at a glance.</p>
+    </div>
+    <div class="d-flex gap-2 flex-wrap">
+        <a href="{% url 'add_products' %}" class="quick-btn add"><i class="fa-solid fa-plus"></i> Add Product</a>
+        <a href="{% url 'seller_products' %}" class="quick-btn products"><i class="fa-solid fa-box"></i> My Products</a>
+    </div>
+</div>
+
+<div class="row g-3 g-lg-4">
+    <div class="col-md-4">
+        <div class="stat-card">
+            <div>
+                <div class="stat-meta">Total Products</div>
+                <div class="stat-value">{{ product_count|default:0 }}</div>
+            </div>
+            <div class="stat-icon" style="background:#2563eb">
+                <i class="fa-solid fa-box fa-lg"></i>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="stat-card">
+            <div>
+                <div class="stat-meta">Total Orders</div>
+                <div class="stat-value">{{ order_count|default:0 }}</div>
+            </div>
+            <div class="stat-icon" style="background:#10b981">
+                <i class="fa-solid fa-cart-shopping fa-lg"></i>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="stat-card">
+            <div>
+                <div class="stat-meta">Total Revenue</div>
+                <div class="stat-value">₹{{ total_revenue|floatformat:0 }}</div>
+            </div>
+            <div class="stat-icon" style="background:#f59e0b">
+                <i class="fa-solid fa-indian-rupee-sign fa-lg"></i>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="quick-card bg-white mt-4 p-4">
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+        <h5 class="mb-0">Quick Actions</h5>
+        <div class="d-flex gap-2 flex-wrap">
+            <a href="{% url 'add_products' %}" class="quick-btn add"><i class="fa-solid fa-plus"></i> Add Product</a>
+            <a href="{% url 'seller_products' %}" class="quick-btn products"><i class="fa-solid fa-briefcase"></i> My Products</a>
+            <a href="{% url 'seller_orders' %}" class="quick-btn orders"><i class="fa-solid fa-cart-shopping"></i> Orders</a>
+        </div>
+    </div>
+</div>
+
+<div class="section-card bg-white mt-4">
+    <div class="p-4 border-bottom border-light d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">Recent Orders</h5>
+        <a href="{% url 'seller_orders' %}" class="text-primary fw-semibold">View all</a>
+    </div>
+    <div class="table-responsive">
+        <table class="table mb-0 align-middle">
+            <thead>
+                <tr>
+                    <th scope="col">Order</th>
+                    <th scope="col">Product</th>
+                    <th scope="col">Qty</th>
+                    <th scope="col">Amount</th>
+                    <th scope="col">Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in recent_orders %}
+                    <tr>
+                        <td>#{{ item.order.id }}</td>
+                        <td class="fw-semibold">{{ item.product.name }}</td>
+                        <td>{{ item.qty }}</td>
+                        <td>₹{{ item.price|floatformat:2 }}</td>
+                        <td>{{ item.order.created_at|date:"M d, Y" }}</td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="5" class="text-center empty-row py-4">
+                            <i class="fa-regular fa-face-smile-beam me-2"></i>No recent orders yet.
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

@@ -12,23 +12,43 @@ def _get_cart(session):
 
 @login_required
 def checkout(request):
+
     cart = request.session.get("cart", {})
     if not cart:
         return redirect("cart_detail")
 
+    cart_items = []
+    grand_total = 0
+
+    for pid, qty in cart.items():
+        product = get_object_or_404(Product, pk=int(pid))
+
+        total_price = product.price * int(qty)
+
+        cart_items.append({
+            "product": product,
+            "qty": qty,
+            "total_price": total_price
+        })
+
+        grand_total += total_price
+
     addresses = Address.objects.filter(user=request.user)
 
     if request.method == "POST":
+
         address_id = request.POST.get("address_id")
 
-        # If selecting existing address
+        # Existing address
         if address_id:
             selected_address = get_object_or_404(Address, id=address_id, user=request.user)
+
             full_name = selected_address.full_name
             phone = selected_address.phone
             address_text = f"{selected_address.address_line}, {selected_address.city}, {selected_address.state} - {selected_address.pincode}"
+
         else:
-            # New address entered
+            # New address
             full_name = request.POST.get("full_name")
             phone = request.POST.get("phone")
             address_text = request.POST.get("address")
@@ -41,8 +61,15 @@ def checkout(request):
         )
 
         for pid, qty in cart.items():
+
             product = get_object_or_404(Product, pk=int(pid))
-            OrderItem.objects.create(order=order, product=product, qty=int(qty), price=product.price)
+
+            OrderItem.objects.create(
+                order=order,
+                product=product,
+                qty=int(qty),
+                price=product.price
+            )
 
             product.stock -= int(qty)
             product.save()
