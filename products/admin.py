@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Category, Product, Banner, Wishlist
+from .models import Category, Product, Banner, Wishlist, SellerRequest
 
 
 @admin.register(Banner)
@@ -38,3 +38,11 @@ class CategoryAdmin(admin.ModelAdmin):
 @admin.register(Wishlist)
 class WishlistAdmin(admin.ModelAdmin):
     list_display = ('user', 'product', 'created_at')
+
+
+@admin.register(SellerRequest)
+class SellerRequestAdmin(admin.ModelAdmin):
+    list_display = ('store_name', 'user', 'phone', 'approved', 'created_at')
+    list_editable = ('approved',)
+    list_filter = ('approved', 'created_at')
+    search_fields = ('store_name', 'user__username', 'phone')
